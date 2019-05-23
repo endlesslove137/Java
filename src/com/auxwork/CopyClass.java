@@ -12,301 +12,312 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
- 
+
 /**
- * ×î½ü·¢ÏÖ¹«Ë¾²¿ÊğÏîÄ¿ÉÏÈ¥µÄÊ±ºò½öĞèÒªÕë¶Ô¸ö±ğµÄclassÎÄ¼ş»òÕßÆäËû¸ö±ğµÄÎÄ¼ş½øĞĞ¸²¸Ç¾ÍĞĞ¡£Ã¿´Î¶¼¾õµÃÊÖ¶¯ÕÒÂ·¾¶¶øÇÒÓÖÒªÕÒÎÄ¼şºÜÂé·³¡£ËùÒÔĞ´ÁËÒ»¸öcopyÎÄ¼şµÄ´úÂë³öÀ´¡£
+ * æœ€è¿‘å‘ç°å…¬å¸éƒ¨ç½²é¡¹ç›®ä¸Šå»çš„æ—¶å€™ä»…éœ€è¦é’ˆå¯¹ä¸ªåˆ«çš„classæ–‡ä»¶æˆ–è€…å…¶ä»–ä¸ªåˆ«çš„æ–‡ä»¶è¿›è¡Œè¦†ç›–å°±è¡Œã€‚æ¯æ¬¡éƒ½è§‰å¾—æ‰‹åŠ¨æ‰¾è·¯å¾„è€Œä¸”åˆè¦æ‰¾æ–‡ä»¶å¾ˆéº»çƒ¦ã€‚æ‰€ä»¥å†™äº†ä¸€ä¸ªcopyæ–‡ä»¶çš„ä»£ç å‡ºæ¥ã€‚
+ * 
  * @author ZMM
  * @version 1.0.3
  * @date 2019.05.10
- * **/
+ **/
 public class CopyClass {
- 
-    private static File fils;
-    // ÔÊĞí¸´ÖÆµÄÎÄ¼şÀàĞÍ
-    public static String[] filterFile = { ".jks", ".js", ".jsp", ".class",".java", ".xml", ".properties", ".sql" };
-    private static long total = 0l;
-    private static List<String> l = new ArrayList<String>();;
-    // 0 ½«Java Ìæ»»Îªclass
-    // 1 Î»url
-    // 2 Ê¶±ğºÅ Îª0µÄÊ±ºò¡£ÊÇÌí¼Óclasses ÏÂµÄÅäÖÃÎÄ¼ş
-    // 3 ¶ÔÓ¦µÄÂ·¾¶
-    static String[] string = new String[4];
-    // ´´½¨Ö¸ÅÉµÄÂ·¾¶
-    private final static String clPth = "www\\WEB-INF\\classes\\";
-    public static void main(String[] args) throws Exception {
-        // ¶ÁÈ¡ÎÄ±¾ĞÅÏ¢
-      getFile(readTxtFile("D:\\program\\Company\\01.PDM\\java\\sinocc.pdm\\PDM-DevOps\\1.ÏµÍ³·¢²¼SOP\\PDM-190516\\filelist_all_zmm.txt"));
- 
-    	
-    }
- 
-    /**
-     * @param l_File
-     *            path
-     **/
-    private static void getFile(List<String> l_File) throws IOException, Exception {
-        for (String sFileName : l_File) {
-            // System.out.println(string);
-            if ("".equals(sFileName) || sFileName == null) {
-                throw new IOException("ÇëÈ·ÈÏÎÄ¼şÊÇ·ñ´æÔÚ");
-            }
-            String[] p = getFile(sFileName, 0);
-            String classPath = "";
-            for (int i = l.size(); i > 0; i--) {
-                classPath += l.get(i - 1) + "\\";
-            }
-            String classp = "";
-            // ±³¿½±´µÄÊı¾İ Ö¸¶¨Ê±¼äÊı¾İ
-            String df = new SimpleDateFormat("yyyyMMdd").format(new Date());
-            File des = null;
-            if ("".equals(classPath)) {
-                // string [2] Îª0µÄÊ±ºò¡£ÊÇÌí¼Óclasses ÏÂµÄÅäÖÃÎÄ¼ş
-                if (p[2].equals("0")) {
-                    classp = p[1] + clPth;
-                    des = new File("D:\\java\\" + df + "\\" + clPth);
-                } else {
-                    classp = p[1];
-                    if (p[3].indexOf("conf") != -1) {
-                        des = new File("D:\\java\\" + df + "\\" + clPth
-                                + p[3].substring(p[3].indexOf("conf") + 4));
-                    } else {
- 
-                        des = new File("D:\\java\\" + df + "\\" + p[3]);
-                    }
-                }
- 
-            } else {
-                classp = p[1] + clPth + classPath;
-                des = new File("D:\\java\\" + df + "\\" + clPth + classPath);
-            }
-            /*
-             * System.out.println("clPth:" + clPth);
-             * System.out.println("classPath:" + classPath);
-             * System.out.println("classp:" + classp);
-             */
-            // ĞèÒª¿½±´µÄÊı¾İ
-            File src = new File(classp.replace("\\", "\\\\"));
-            // filterFile=new String []{p[0]};
-            new CopyClass().copyFolder(src, des, filterFile, p[0]);
-            // ÖØÖÃ
-            l = new ArrayList<String>();
-        }
-    }
- 
-    /**
-     * ¶ÁÈ¡ÎÄ±¾Êı¾İ
-     * **/
-    public static List<String> readTxtFile(String filePath) {
-        List<String> l_File = new ArrayList<String>();
-        try {
-            String encoding = "UTF-8";
-            File file = new File(filePath);
-            // System.out.println(filePath);
-            // ÅĞ¶ÏÎÄ¼şÊÇ·ñ´æÔÚ
-            if (file.isFile() && file.exists()) { 
-            	// ¿¼ÂÇµ½±àÂë¸ñÊ½
-                InputStreamReader read = new InputStreamReader(new FileInputStream(file), encoding);
-                BufferedReader bufferedReader = new BufferedReader(read);
-                String lineTxt = null;
-                while ((lineTxt = bufferedReader.readLine()) != null && !"".equals(lineTxt)) {
-                	lineTxt = "D:\\program\\Company\\01.PDM\\java" + lineTxt;
-                	lineTxt = lineTxt.replace("\\", "\\\\");
-                	lineTxt = lineTxt.replace("\"", "");
-                	if (!"".equals(lineTxt)) l_File.add(lineTxt);
-                }
-                read.close();
-            } else {
-                System.out.println("ÕÒ²»µ½Ö¸¶¨µÄÎÄ¼ş");
-            }
-        } catch (Exception e) {
-            System.out.println("¶ÁÈ¡ÎÄ¼şÄÚÈİ³ö´í");
-            e.printStackTrace();
-        }
-        return l_File;
-    }
- 
-    /**
-     * @param path
-     *            ×xÎÄ™nÂ·¾¶
-     * @param flag
-     *            ±êÊ¶·û
-     * **/
- 
-    private static String[] getFile(String path, int flag) {
-        fils = new File(path);
-        // System.out.println("path:"+path);
-        if (fils.isFile()) {
-            // System.out.println("fils:"+fils.getName());
-            string[0] = fils.getName().replace("java", "class");
-        } else {
-            // ÎÄ¼ş¼ĞÃû×Ö
-            if (!"src".equals(fils.getName())) {
-                l.add(fils.getName());
-            }
- 
-            if ("".equals(fils.getName())) {
-                l.add("classes");
-            }
-        }
-        if (fils.getParent().lastIndexOf("src") != -1) {
-            path = fils.getParent();
-            if ((path.lastIndexOf("src") + 3) != path.length()) {
-                return getFile(path, 0);
-            } else if ((path.lastIndexOf("src")) <= path.length()) {
-                return getFile(path, 1);
-            }
-        }
-        if (flag == 1) {
-            // D:\springmvc
-            string[1] = path.substring(0, path.lastIndexOf("src")).replace(
-                    "src", "");
-            string[2] = "0";
-        } else {
- 
-            // System.out.println(path);
-            if (path.lastIndexOf("src") > -1) {
-                string[1] = path.substring(0, path.lastIndexOf("src"));
-            } else {
- 
-                // /D:\\springmvc01\\WebRoot\\WEB-INF\\index.jsp
-                string[1] = path.replace(string[0], "");
-            }
-            string[2] = "";
- 
-            // Õë¶Ôspring mvc ÅäÖÃµÄconf ÎÄ¼ş ĞèÒªcopyµ½classesÎÄ¼şÏÂ
-            if (path.indexOf("WebRoot") == -1) {
- 
-                // System.out.println(
-                // path.substring(path.indexOf("conf"),path.indexOf(string[0])));
-                string[3] = path.substring(path.indexOf("conf"),
-                        path.indexOf(string[0]));
-            } else {
- 
-                string[3] = path.substring(path.indexOf("WebRoot"),
-                        path.indexOf(string[0]));
-            }
- 
-        }
- 
-        return string;
-        /*
-         * for (int i = 0; i < fils.listFiles().length; i++) { for (File file :
-         * fils.listFiles()) { //Èç¹û²»ÊÇÄ¿Â¼£¬Ö±½ÓÌí¼Ó if (!file.isDirectory()) {
-         * System.out.println(file.getAbsolutePath()); } else {
-         * System.out.println(fils.getAbsolutePath()); //¶ÔÓÚÄ¿Â¼ÎÄ¼ş£¬µİ¹éµ÷ÓÃ
-         * getFile(file.getAbsolutePath()); } } }
-         */
-    }
- 
-    /**
-     *
-     * @param folder
-     * @param filterFile
-     * @param fileName
-     * @throws Exception
-     */
-    public void copyFolder(File srcFolder, File destFolder,
-            String[] filterFile, String fname) throws Exception {
-        File[] files = srcFolder.listFiles();
-        // System.out.println(destFolder);
-        // ÏÈÉ¾³ı¾ÉÎÄ¼ş „“½¨Ä¿ä›
+
+	private static File fils;
+	// å…è®¸å¤åˆ¶çš„æ–‡ä»¶ç±»å‹
+	public static String[] filterFile = { ".jks", ".js", ".jsp", ".class", ".java", ".xml", ".properties", ".sql" };
+	public static String[] srcDirList = { "src", "src_openapi" };
+
+	private static long total = 0l;
+	private static List<String> strPackagePath = new ArrayList<String>();;
+	private static List<String> errFileList = new ArrayList<String>();
+
+	// 0 å°†Java æ›¿æ¢ä¸ºclass
+	// 1 ä½url
+	// 2 è¯†åˆ«å· ä¸º0çš„æ—¶å€™ã€‚æ˜¯æ·»åŠ classes ä¸‹çš„é…ç½®æ–‡ä»¶
+	// 3 å¯¹åº”çš„è·¯å¾„
+	static String[] string = new String[4];
+	// åˆ›å»ºæŒ‡æ´¾çš„è·¯å¾„
+	private final static String clPth = "www\\WEB-INF\\classes\\";
+
+	public static void main(String[] args) throws Exception {
+		// è¯»å–æ–‡æœ¬ä¿¡æ¯
+		getFile(getSrcFileNameList(
+				"D:\\program\\Company\\Formal\\sinocc.pdm\\PDM-DevOps\\1.ç³»ç»Ÿå‘å¸ƒSOP\\PDM-190523\\test.txt"));
+	}
+
+	/**
+	 * @param srcFileNameList path
+	 **/
+	private static void getFile(List<String> srcFileNameList) throws IOException, Exception {
+		for (String sFileName : srcFileNameList) {
+			// System.out.println(string);
+			if ("".equals(sFileName) || sFileName == null) {
+				errFileList.add(String.format("[Error][æ–‡ä»¶åç§°éæ³•]", sFileName));
+				continue;
+//                throw new IOException("è¯·ç¡®è®¤æ–‡ä»¶æ˜¯å¦å­˜åœ¨");
+			}
+			String[] aClassInfo = getFile(sFileName, 0);
+			String classPath = "";
+			for (int i = strPackagePath.size(); i > 0; i--) {
+				classPath += strPackagePath.get(i - 1) + "\\";
+			}
+			String classp = "";
+			// èƒŒæ‹·è´çš„æ•°æ® æŒ‡å®šæ—¶é—´æ•°æ®
+			String strDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
+			File des = null;
+			if ("".equals(classPath)) {
+				// string [2] ä¸º0çš„æ—¶å€™ã€‚æ˜¯æ·»åŠ classes ä¸‹çš„é…ç½®æ–‡ä»¶
+				if (aClassInfo[2].equals("0")) {
+					classp = aClassInfo[1] + clPth;
+					des = new File("D:\\java\\" + strDate + "\\" + clPth);
+
+				} else {
+					classp = aClassInfo[1];
+					if (aClassInfo[3].indexOf("conf") != -1) {
+						des = new File("D:\\java\\" + strDate + "\\" + clPth
+								+ aClassInfo[3].substring(aClassInfo[3].indexOf("conf") + 4));
+					} else {
+
+						des = new File("D:\\java\\" + strDate + "\\" + aClassInfo[3]);
+					}
+				}
+
+			} else {
+				classp = aClassInfo[1] + clPth + classPath;
+				String sDes = "D:\\java\\" + strDate + "\\" + clPth + classPath;
+				des = new File(sDes);
+			}
+			/*
+			 * System.out.println("clPth:" + clPth); System.out.println("classPath:" +
+			 * classPath); System.out.println("classp:" + classp);
+			 */
+			// éœ€è¦æ‹·è´çš„æ•°æ®
+			File src = new File(classp.replace("\\", "\\\\"));
+			new CopyClass().copyFolder(src, des, filterFile, aClassInfo[0]);
+			// é‡ç½®
+			strPackagePath = new ArrayList<String>();
+		}
+	}
+
+	/**
+	 * è¯»å–æ–‡æœ¬æ•°æ®
+	 **/
+	public static List<String> getSrcFileNameList(String filePath) {
+		List<String> srcFileNameList = new ArrayList<String>();
+		try {
+			String encoding = "UTF-8";
+			File file = new File(filePath);
+			// System.out.println(filePath);
+			// åˆ¤æ–­æ–‡ä»¶æ˜¯å¦å­˜åœ¨
+			if (file.isFile() && file.exists()) {
+				// è€ƒè™‘åˆ°ç¼–ç æ ¼å¼
+				InputStreamReader read = new InputStreamReader(new FileInputStream(file), encoding);
+				BufferedReader bufferedReader = new BufferedReader(read);
+				String lineTxt = null;
+				while ((lineTxt = bufferedReader.readLine()) != null && !"".equals(lineTxt)) {
+					lineTxt = lineTxt.replace("\"", "");
+					lineTxt = lineTxt.replace(" ", "");
+					if ("".equals(lineTxt))
+						continue;
+					lineTxt = "D:\\program\\Company\\Formal" + lineTxt;
+					lineTxt = lineTxt.replace("\\", "\\\\");
+					srcFileNameList.add(lineTxt);
+				}
+				read.close();
+			} else {
+				System.out.println("æ‰¾ä¸åˆ°æŒ‡å®šçš„æ–‡ä»¶");
+			}
+		} catch (Exception e) {
+			System.out.println("è¯»å–æ–‡ä»¶å†…å®¹å‡ºé”™");
+			e.printStackTrace();
+		}
+		return srcFileNameList;
+	}
+
+	/**
+	 * @param path è®€æ–‡æª”è·¯å¾„
+	 * @param flag æ ‡è¯†ç¬¦
+	 **/
+
+	private static String[] getFile(String path, int flag) {
+		fils = new File(path);
+		// System.out.println("path:"+path);
+		if (fils.isFile()) {
+			// System.out.println("fils:"+fils.getName());
+			string[0] = fils.getName().replace("java", "class");
+		} else {
+			// æ–‡ä»¶å¤¹åå­—
+			if (!"src".equals(fils.getName())) {
+				strPackagePath.add(fils.getName());
+			}
+
+			if ("".equals(fils.getName())) {
+				strPackagePath.add("classes");
+			}
+		}
+//        for (String srcDir : srcDirList) {
+//	          if (fils.getParent().lastIndexOf(srcDir) != -1) {
+//	        	  path = fils.getParent();
+//		          if ((path.lastIndexOf(srcDir) + srcDir.length()) != path.length()) {
+//		              return getFile(path, 0);
+//		          } else if ((path.lastIndexOf(srcDir)) <= path.length()) {
+//		              return getFile(path, 1);
+//		          }
+//	          }
+//        }
+
+		if (fils.getParent().lastIndexOf("src") != -1) {
+			path = fils.getParent();
+			if ((path.lastIndexOf("src") + 3) != path.length()) {
+				return getFile(path, 0);
+			} else if ((path.lastIndexOf("src")) <= path.length()) {
+				return getFile(path, 1);
+			}
+		}
+		if (flag == 1) {
+			// D:\springmvc
+			string[1] = path.substring(0, path.lastIndexOf("src")).replace("src", "");
+			string[2] = "0";
+		} else {
+
+			// System.out.println(path);
+			if (path.lastIndexOf("src") > -1) {
+				string[1] = path.substring(0, path.lastIndexOf("src"));
+			} else {
+
+				// /D:\\springmvc01\\WebRoot\\WEB-INF\\index.jsp
+				string[1] = path.replace(string[0], "");
+			}
+			string[2] = "";
+
+			// é’ˆå¯¹spring mvc é…ç½®çš„conf æ–‡ä»¶ éœ€è¦copyåˆ°classesæ–‡ä»¶ä¸‹
+			if (path.indexOf("WebRoot") == -1) {
+
+				// System.out.println(
+				// path.substring(path.indexOf("conf"),path.indexOf(string[0])));
+				string[3] = path.substring(path.indexOf("conf"), path.indexOf(string[0]));
+			} else {
+				string[3] = path.substring(path.indexOf("WebRoot"), path.indexOf(string[0]));
+			}
+
+		}
+
+		return string;
+		/*
+		 * for (int i = 0; i < fils.listFiles().length; i++) { for (File file :
+		 * fils.listFiles()) { //å¦‚æœä¸æ˜¯ç›®å½•ï¼Œç›´æ¥æ·»åŠ  if (!file.isDirectory()) {
+		 * System.out.println(file.getAbsolutePath()); } else {
+		 * System.out.println(fils.getAbsolutePath()); //å¯¹äºç›®å½•æ–‡ä»¶ï¼Œé€’å½’è°ƒç”¨
+		 * getFile(file.getAbsolutePath()); } } }
+		 */
+	}
+
+	/**
+	 *
+	 * @param folder
+	 * @param filterFile
+	 * @param fileName
+	 * @throws Exception
+	 */
+	public void copyFolder(File srcFolder, File destFolder, String[] filterFile, String destFilename) throws Exception {
+		File[] srcDirFiles = srcFolder.listFiles();
+		// System.out.println(destFolder);
+		// å…ˆåˆ é™¤æ—§æ–‡ä»¶ å‰µå»ºç›®éŒ„
 //        deleteDir(destFolder);
-        destFolder.mkdirs();
- 
-        for (File file : files) {
-            if (file.isFile()) {
-                String vl=file.getName().substring(file.getName().lastIndexOf("\\")+1,file.getName().length()).replace(".class", "");
-    //          System.out.println("vl:"+vl);
+		destFolder.mkdirs();
+
+		for (File srcFile : srcDirFiles) {
+			if (srcFile.isFile()) {
+				String srcFileName = srcFile.getName()
+						.substring(srcFile.getName().lastIndexOf("\\") + 1, srcFile.getName().length())
+						.replace(".class", "");
+				// System.out.println("vl:"+vl);
 //              if (fname !=null && vl.equals(fname.replace(".class", ""))||vl.indexOf(fname.replace(".class", "")+"$")==0) {
-              if (vl.equals(fname.replace(".class", ""))||vl.indexOf(fname.replace(".class", "")+"$")==0) {
-                     System.out.println("test:"+file.getName());
-                    String pathname = destFolder + File.separator
-                            + file.getName();
-                    for (String suff : filterFile) {
-                        if (pathname.endsWith(suff)) {
-                            File dest = new File(pathname);
-                            File destPar = dest.getParentFile();
-                            destPar.mkdirs();
-                            if (!dest.exists()) {
-                                dest.createNewFile();
-                            }
-                            // D:\springmvc\WebRoot\WEB-INF\index.jsp
-                            // D:\java\20160603\WebRoot\index.jsp
-                            // ÎªÁË·ÀÖ¹ÖØÃüÃû²¢ÇÒ²»ÔÚÍ¬Ò»¸öÂ·¾¶ÏÂCOPY
-                            if ((file.getParent()
-                                    .substring(file.getParent().length() - 4,
-                                            file.getParent().length() - 1)
-                                    .equals(dest.getParent().substring(
-                                            dest.getParent().length() - 4,
-                                            dest.getParent().length() - 1)))||file.getParent().contains("conf")) {
-                                if (file.length() == 0) {
-                                    throw new IOException("ÎÄ¼ş²»ÔÊĞíÎª¿Õ"
-                                            + "£¬ĞèÒª´¦ÀíµÄÎÄ¼şÎª£º" + file.getParent()
-                                            + "\\" + file.getName());
-                                }
-                                copyFile(file, dest);
-                            }
- 
-                        }
-                    }
-                }
-            } else {
-                copyFolder(file, destFolder, filterFile, fname);
-            }
-        }
-    }
- 
-    /***
-     * copy file
-     *
-     * @param src
-     * @param dest
-     * @throws IOException
-     */
-    private void copyFile(File src, File dest) throws Exception {
-        BufferedInputStream reader = null;
-        BufferedOutputStream writer = null;
- 
-        try {
-            reader = new BufferedInputStream(new FileInputStream(src));
-            writer = new BufferedOutputStream(new FileOutputStream(dest));
-            byte[] buff = new byte[reader.available()];
-            while ((reader.read(buff)) != -1) {
-                writer.write(buff);
-            }
-            total += 1;
-        } catch (Exception e) {
-            throw e;
-        } finally {
-            writer.flush();
-            writer.close();
-            reader.close();
-            // ¼ÇÂ¼
-            String temp = "\ncopy:\n" + src + "\tsize:" + src.length()
-                    + "\nto:\n" + dest + "\tsize:" + dest.length()
-                    + "\n complate\n totoal:" + total;
-            System.out.println(temp);
-        }
-    }
- 
-    /**
-     * µİ¹éÉ¾³ıÄ¿Â¼ÏÂµÄËùÓĞÎÄ¼ş¼°×ÓÄ¿Â¼ÏÂËùÓĞÎÄ¼ş
-     *
-     * @param dir
-     *            ½«ÒªÉ¾³ıµÄÎÄ¼şÄ¿Â¼ ÔİÊ±»¹Ã»ÓÃ
-     */
-    private static boolean deleteDir(File dir) {
-        if (dir.isDirectory()) {
-            String[] children = dir.list();
- 
-            for (int i = 0; i < children.length; i++) {
-                boolean success = deleteDir(new File(dir, children[i]));
-                if (!success) {
-                    return false;
-                }
-            }
-        }
-        // Ä¿Â¼´ËÊ±Îª¿Õ£¬¿ÉÒÔÉ¾³ı
-        return dir.delete();
-    }
+				if (srcFileName.equals(destFilename.replace(".class", ""))
+						|| srcFileName.indexOf(destFilename.replace(".class", "") + "$") == 0) {
+					System.out.println("æ‰¾åˆ°ç›®æ ‡æ–‡ä»¶:" + srcFile.getName());
+					String desFilePathName = destFolder + File.separator + srcFile.getName();
+					for (String suff : filterFile) {
+						if (desFilePathName.endsWith(suff)) {
+							File destFile = new File(desFilePathName);
+							File destPar = destFile.getParentFile();
+							destPar.mkdirs();
+							if (!destFile.exists()) {
+								destFile.createNewFile();
+							}
+							// D:\springmvc\WebRoot\WEB-INF\index.jsp
+							// D:\java\20160603\WebRoot\index.jsp
+							// ä¸ºäº†é˜²æ­¢é‡å‘½åå¹¶ä¸”ä¸åœ¨åŒä¸€ä¸ªè·¯å¾„ä¸‹COPY
+							if ((srcFile.getParent()
+									.substring(srcFile.getParent().length() - 4, srcFile.getParent().length() - 1)
+									.equals(destFile.getParent().substring(destFile.getParent().length() - 4,
+											destFile.getParent().length() - 1)))
+									|| srcFile.getParent().contains("conf")) {
+								if (srcFile.length() == 0) {
+									throw new IOException(
+											"æ–‡ä»¶ä¸å…è®¸ä¸ºç©º" + "ï¼Œéœ€è¦å¤„ç†çš„æ–‡ä»¶ä¸ºï¼š" + srcFile.getParent() + "\\" + srcFile.getName());
+								}
+								copyFile(srcFile, destFile);
+							}
+
+						}
+					}
+				}
+			} else {
+				copyFolder(srcFile, destFolder, filterFile, destFilename);
+			}
+		}
+	}
+
+	/***
+	 * copy file
+	 *
+	 * @param src
+	 * @param dest
+	 * @throws IOException
+	 */
+	private void copyFile(File src, File dest) throws Exception {
+		BufferedInputStream reader = null;
+		BufferedOutputStream writer = null;
+
+		try {
+			reader = new BufferedInputStream(new FileInputStream(src));
+			writer = new BufferedOutputStream(new FileOutputStream(dest));
+			byte[] buff = new byte[reader.available()];
+			while ((reader.read(buff)) != -1) {
+				writer.write(buff);
+			}
+			total += 1;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			writer.flush();
+			writer.close();
+			reader.close();
+			// è®°å½•
+			String temp = "\ncopy:\n" + src + "\tsize:" + src.length() + "\nto:\n" + dest + "\tsize:" + dest.length()
+					+ "\n complate\n totoal:" + total;
+			System.out.println(temp);
+		}
+	}
+
+	/**
+	 * é€’å½’åˆ é™¤ç›®å½•ä¸‹çš„æ‰€æœ‰æ–‡ä»¶åŠå­ç›®å½•ä¸‹æ‰€æœ‰æ–‡ä»¶
+	 *
+	 * @param dir å°†è¦åˆ é™¤çš„æ–‡ä»¶ç›®å½• æš‚æ—¶è¿˜æ²¡ç”¨
+	 */
+	private static boolean deleteDir(File dir) {
+		if (dir.isDirectory()) {
+			String[] children = dir.list();
+
+			for (int i = 0; i < children.length; i++) {
+				boolean success = deleteDir(new File(dir, children[i]));
+				if (!success) {
+					return false;
+				}
+			}
+		}
+		// ç›®å½•æ­¤æ—¶ä¸ºç©ºï¼Œå¯ä»¥åˆ é™¤
+		return dir.delete();
+	}
 }
